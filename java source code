@@ -1,0 +1,71 @@
+Backend Java code
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class Registration {
+    public static void main(String[] args) throws ClassNotFoundException {
+        
+       
+        try {
+        	Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/RegistrationDetails","root","tanu@0810");
+         
+            connection.setAutoCommit(false);
+            
+           
+            String insertSQL = "INSERT INTO RegistrationDetails_table (Name, Email, DateOfBirth, PhoneNumber) VALUES (?, ?, ?, ?)";
+            
+            try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+                
+              	preparedStatement.setString(1, "1");
+                preparedStatement.setString(1, "John Doe");
+                preparedStatement.setString(2, "johndoe@example.com");
+                preparedStatement.setDate(3, Date.valueOf("1990-01-01"));
+                preparedStatement.setString(4, "1234567890");
+                preparedStatement.addBatch(); 
+                
+                preparedStatement.setString(1, "2");
+                preparedStatement.setString(1, "Jane Smith");
+                preparedStatement.setString(2, "janesmith@example.com");
+                preparedStatement.setDate(3, Date.valueOf("1985-05-12"));
+                preparedStatement.setString(4, "9876543210");
+                preparedStatement.addBatch(); 
+                
+                preparedStatement.setString(1, "3");
+                preparedStatement.setString(1, "Alice Brown");
+                preparedStatement.setString(2, "alicebrown@example.com");
+                preparedStatement.setDate(3, Date.valueOf("1992-09-30"));
+                preparedStatement.setString(4, "1029384756");
+                preparedStatement.addBatch(); 
+                
+                preparedStatement.setString(1, "4");
+                preparedStatement.setString(1, "Bob Green");
+                preparedStatement.setString(2, "bobgreen@example.com");
+                preparedStatement.setDate(3, Date.valueOf("1980-03-15"));
+                preparedStatement.setString(4, "5647382910");
+                preparedStatement.addBatch(); 
+                
+                
+                int[] results = preparedStatement.executeBatch(); // Execute the batch
+                
+               
+                connection.commit();
+                
+                System.out.println(results.length + " records inserted successfully.");
+                
+            } catch (SQLException e) {
+               
+                connection.rollback();
+                System.out.println("Error inserting data: " + e.getMessage());
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Database connection error: " + e.getMessage());
+        }
+        }
+}
+

@@ -1,0 +1,16 @@
+SQL DATABASE
+
+Create database RegistrationDetails;
+use RegistrationDetails;
+CREATE TABLE RegistrationDetails_table (
+    id int,
+    Name VARCHAR(100),
+    Email VARCHAR(100),
+    DateOfBirth DATE,
+    PhoneNumber VARCHAR(15)
+);
+
+
+
+
+SELECT * FROM RegistrationDetails_table;

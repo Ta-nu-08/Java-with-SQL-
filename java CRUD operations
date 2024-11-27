@@ -1,0 +1,134 @@
+Backend Java code
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CRUDOperators {
+
+    private static final String URL = "jdbc:mysql://localhost:3306/RegistrationDetails";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "tanu@0810";
+
+    // Helper method to establish the connection
+    private static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+    }
+
+    // Create Operation
+    public static void createRecord(String name, String email, String dateOfBirth, String phoneNumber) {
+        String insertSQL = "INSERT INTO RegistrationDetails_table (Name, Email, DateOfBirth, PhoneNumber) VALUES (?, ?, ?, ?)";
+
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, email);
+            preparedStatement.setDate(3, Date.valueOf(dateOfBirth));
+            preparedStatement.setString(4, phoneNumber);
+
+            int result = preparedStatement.executeUpdate();
+            System.out.println(result + " record(s) inserted successfully.");
+
+        } catch (SQLException e) {
+            System.out.println("Error creating record: " + e.getMessage());
+        }
+    }
+
+    // Read Operation
+    public static List<String> readRecords() {
+        String selectSQL = "SELECT * FROM RegistrationDetails_table";
+        List<String> records = new ArrayList<>();
+
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(selectSQL)) {
+
+            while (resultSet.next()) {
+                String record = "ID: " + resultSet.getInt("id") +
+                                ", Name: " + resultSet.getString("Name") +
+                                ", Email: " + resultSet.getString("Email") +
+                                ", DateOfBirth: " + resultSet.getDate("DateOfBirth") +
+                                ", Phone: " + resultSet.getString("PhoneNumber");
+                records.add(record);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error reading records: " + e.getMessage());
+        }
+        return records;
+    }
+
+    // Update Operation
+    public static void updateRecord(int id, String name, String email, String dateOfBirth, String phoneNumber) {
+        String updateSQL = "UPDATE RegistrationDetails_table SET Name = ?, Email = ?, DateOfBirth = ?, PhoneNumber = ? WHERE id = ?";
+
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
+
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, email);
+            preparedStatement.setDate(3, Date.valueOf(dateOfBirth));
+            preparedStatement.setString(4, phoneNumber);
+            preparedStatement.setInt(5, id);
+
+            int result = preparedStatement.executeUpdate();
+            if (result > 0) {
+                System.out.println("Record updated successfully.");
+            } else {
+                System.out.println("No record found with the given ID.");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error updating record: " + e.getMessage());
+        }
+    }
+
+    // Delete Operation
+    public static void deleteRecord(int id) {
+        String deleteSQL = "DELETE FROM RegistrationDetails_table WHERE id = ?";
+
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+
+            preparedStatement.setInt(1, id);
+            int result = preparedStatement.executeUpdate();
+            if (result > 0) {
+                System.out.println("Record deleted successfully.");
+            } else {
+                System.out.println("No record found with the given ID.");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error deleting record: " + e.getMessage());
+        }
+    }
+
+    // Main method to demonstrate the CRUD operations
+    public static void main(String[] args) {
+
+        // Create records
+        createRecord("John Doe", "johndoe@example.com", "1990-01-01", "1234567890");
+        createRecord("Jane Smith", "janesmith@example.com", "1985-05-12", "9876543210");
+
+        // Read records
+        System.out.println("Reading records...");
+        List<String> records = readRecords();
+        for (String record : records) {
+            System.out.println(record);
+        }
+
+        // Update a record
+        updateRecord(1, "John Doe", "john.doe@updated.com", "1990-01-01", "1234567890");
+
+        // Delete a record
+        deleteRecord(2);
+
+        // Read records again after update and delete
+        System.out.println("Reading records after update and delete...");
+        records = readRecords();
+        for (String record : records) {
+            System.out.println(record);
+        }
+    }
+}
